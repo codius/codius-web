@@ -1,2 +1,2 @@
 # codius-web
-Access Codius deployments from the web
+Web-monetized Codius service deploy page.

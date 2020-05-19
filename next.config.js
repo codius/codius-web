@@ -4,7 +4,7 @@ module.exports = {
   },
   publicRuntimeConfig: {
     // Will be available on both server and client
-    dashboardUrl: process.env.DASHBOARD_URL,
+    receiptVerifierUrl: process.env.RECEIPT_VERIFIER_URL,
     paymentPointer: process.env.PAYMENT_POINTER
   }
 }

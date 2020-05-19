@@ -9,7 +9,7 @@ const WebMonetizationLoader: React.FC = ({ children }) => {
   } else if (monetizationState === 'started') {
     return <>{children}</>
   } else {
-    return <p>Sorry! You need <a href='https://webmonetization.org'>Web Monetization</a> to view this content.</p>
+    return <p>You can deploy to this Codius host by paying with <a href='https://webmonetization.org'>Web Monetization</a>.</p>
   }
 }
 
