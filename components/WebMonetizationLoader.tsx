@@ -1,15 +1,41 @@
-import * as React from 'react'
-const { useMonetizationState } = require('react-web-monetization')
+import { FC, useEffect, useState } from 'react'
+const { useMonetizationCounter } = require('react-web-monetization')
 
-const WebMonetizationLoader: React.FC = ({ children }) => {
-  const { state: monetizationState } = useMonetizationState()
+interface WMLoaderProps {
+  balanceId?: string,
+  receiptVerifierUriPublic: string
+}
 
-  if (monetizationState === 'pending') {
+const WebMonetizationLoader: FC<WMLoaderProps> = (props) => {
+  const { state: monetizationState, requestId, receipt } = useMonetizationCounter()
+  const [paid, setPaid] = useState(false)
+
+  useEffect(() => {
+    if (requestId && receipt) {
+      const id = props.balanceId || requestId
+      const submitReceipt = async () => {
+        const res = await fetch(
+          `${props.receiptVerifierUriPublic}/balances/${id}:creditReceipt`,
+          {
+            method: 'POST',
+            body: receipt
+          }
+        )
+        if (res.ok) {
+          // should require a minimum returned balance?
+          setPaid(true)
+        }
+      }
+      submitReceipt()
+    }
+  }, [receipt])
+
+  if (paid) {
+    return <>{props.children}</>
+  } else if (monetizationState === 'pending' || monetizationState === 'started') {
     return <p>Awaiting Web Monetization...</p>
-  } else if (monetizationState === 'started') {
-    return <>{children}</>
   } else {
-    return <p>You can deploy to this Codius host by paying with <a href='https://webmonetization.org'>Web Monetization</a>.</p>
+    return <p>Pay with <a href='https://webmonetization.org'>Web Monetization</a> to access this Codius host.</p>
   }
 }
 

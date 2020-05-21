@@ -1,30 +1,13 @@
 import { FC, useState, useEffect } from 'react'
-const { useMonetizationCounter } = require('react-web-monetization')
+const { useMonetizationState } = require('react-web-monetization')
 
-interface InstructionsProps {
-  receiptVerifierUrl: string
-}
-
-const Instructions: FC<InstructionsProps> = (props: InstructionsProps) => {
-  console.log(props)
-  const { requestId, receipt } = useMonetizationCounter()
+const Instructions: FC = () => {
+  const { requestId } = useMonetizationState()
   const [url, setUrl] = useState('')
 
   useEffect(() => {
     setUrl(window.location.href)
   }, [])
-
-  useEffect(() => {
-    if (requestId && receipt) {
-      fetch(
-        `${props.receiptVerifierUrl}/balances/${requestId}:creditReceipt`,
-        {
-          method: 'POST',
-          body: receipt
-        }
-      )
-    }
-  }, [receipt])
 
   return (
     <div>
