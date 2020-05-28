@@ -9,7 +9,7 @@ const { publicRuntimeConfig } = getConfig()
 
 interface AuthProps {
   codius_web_url: string,
-  receiptVerifierUriPublic: string,
+  receiptVerifierUri: string,
   paymentPointer: string
 }
 
@@ -28,7 +28,7 @@ const Authenticate: NextPage<AuthProps> = (props: AuthProps) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <meta name='monetization' content={props.paymentPointer} />
       </Head>
-      <WebMonetizationLoader receiptVerifierUriPublic={props.receiptVerifierUriPublic} balanceId={id as string}>
+      <WebMonetizationLoader receiptVerifierUri={props.receiptVerifierUri} balanceId={id as string}>
         <Loader serviceUrl={serviceUrl.href} />
       </WebMonetizationLoader>
     </div>

@@ -7,7 +7,7 @@ import Head from 'next/head'
 const { publicRuntimeConfig } = getConfig()
 
 interface IndexProps {
-  receiptVerifierUriPublic: string,
+  receiptVerifierUri: string,
   paymentPointer: string
 }
 
@@ -20,7 +20,7 @@ const IndexPage: NextPage<IndexProps> = (props: IndexProps) => (
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       <meta name='monetization' content={props.paymentPointer} />
     </Head>
-    <WebMonetizationLoader receiptVerifierUriPublic={props.receiptVerifierUriPublic}>
+    <WebMonetizationLoader receiptVerifierUri={props.receiptVerifierUri}>
       <Instructions/>
     </WebMonetizationLoader>
   </div>

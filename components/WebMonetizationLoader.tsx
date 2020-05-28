@@ -3,7 +3,7 @@ const { useMonetizationCounter } = require('react-web-monetization')
 
 interface WMLoaderProps {
   balanceId?: string,
-  receiptVerifierUriPublic: string
+  receiptVerifierUri: string
 }
 
 const WebMonetizationLoader: FC<WMLoaderProps> = (props) => {
@@ -15,7 +15,7 @@ const WebMonetizationLoader: FC<WMLoaderProps> = (props) => {
       const id = props.balanceId || requestId
       const submitReceipt = async () => {
         const res = await fetch(
-          `${props.receiptVerifierUriPublic}/balances/${id}:creditReceipt`,
+          `${props.receiptVerifierUri}/balances/${id}:creditReceipt`,
           {
             method: 'POST',
             body: receipt
