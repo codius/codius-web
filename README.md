@@ -1,4 +1,7 @@
 # codius-web
+
+![](https://github.com/codius/codius-web/workflows/Docker%20CI/badge.svg)
+
 Web-monetized Codius service deployment and loading pages.
 
 ### Run

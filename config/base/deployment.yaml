@@ -17,4 +17,4 @@ spec:
     spec:
       containers:
       - name: codius-web
-        image: wilsonianbcoil/codius-web
+        image: codius/codius-web
