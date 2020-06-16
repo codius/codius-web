@@ -14,10 +14,6 @@ PAYMENT_POINTER=$codius.example.com npm start
 
 ### Environment Variables
 
-#### CODIUS_WEB_URL
-* Type: String
-* Description: The URL at which to codius-web is being served.
-
 #### PAYMENT_POINTER
 * Type: String
 * Description: Codius host's [payment pointer](https://paymentpointers.org/).

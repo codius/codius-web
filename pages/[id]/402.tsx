@@ -16,8 +16,6 @@ interface AuthProps {
 const Authenticate: NextPage<AuthProps> = (props: AuthProps) => {
   const router = useRouter()
   const { id } = router.query
-  const serviceUrl = new URL(publicRuntimeConfig.codius_web_url)
-  serviceUrl.host = `${id}.${serviceUrl.host}`
 
   return (
     <div>
@@ -29,7 +27,7 @@ const Authenticate: NextPage<AuthProps> = (props: AuthProps) => {
         <meta name='monetization' content={props.paymentPointer} />
       </Head>
       <WebMonetizationLoader receiptVerifierUri={props.receiptVerifierUri} balanceId={id as string}>
-        <Loader serviceUrl={serviceUrl.href} />
+        <Loader serviceName={id as string} />
       </WebMonetizationLoader>
     </div>
   )
