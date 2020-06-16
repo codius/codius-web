@@ -4,9 +4,11 @@ const { useMonetizationState } = require('react-web-monetization')
 const Instructions: FC = () => {
   const { requestId } = useMonetizationState()
   const [url, setUrl] = useState('')
+  const [serviceUrl, setServiceUrl] = useState('')
 
   useEffect(() => {
     setUrl(window.location.href)
+    setServiceUrl(`${window.location.protocol}//<service-name>.${window.location.host}`)
   }, [])
 
   return (
@@ -31,7 +33,8 @@ const Instructions: FC = () => {
         kubectl
         </a>:
       </pre>
-      <pre>KUBECONFIG=none kubectl create -f codius-service.yaml -s {url} --token="{requestId}"</pre>
+      <pre>&nbsp;&nbsp;KUBECONFIG=none kubectl create -f codius-service.yaml -s {url} --token="{requestId}"</pre>
+      <pre>Deployed service will be available at {serviceUrl}</pre>
     </div>
   )
 }
