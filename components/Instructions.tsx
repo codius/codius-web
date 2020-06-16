@@ -13,9 +13,25 @@ const Instructions: FC = () => {
     <div>
       <p></p>
       <pre>
-        Deploy a Codius service to this host using <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">kubectl</a>
+        Deploy a <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://godoc.org/github.com/codius/codius-crd-operator/api/v1alpha1#Service">
+        Codius service
+        </a> (see <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://github.com/codius/codius-crd-operator/blob/master/config/samples/core_v1alpha1_service.yaml">
+        sample
+        </a>
+        ) to this host using <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">
+        kubectl
+        </a>:
       </pre>
-      <pre>kubectl apply -f codius-service.yaml -s {url} --token="{requestId}"</pre>
+      <pre>KUBECONFIG=none kubectl create -f codius-service.yaml -s {url} --token="{requestId}"</pre>
     </div>
   )
 }
