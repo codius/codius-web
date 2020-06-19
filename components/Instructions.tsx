@@ -5,10 +5,12 @@ const Instructions: FC = () => {
   const { requestId } = useMonetizationState()
   const [url, setUrl] = useState('')
   const [serviceUrl, setServiceUrl] = useState('')
+  const [serviceResourceUrl, setServiceResourceUrl] = useState('')
 
   useEffect(() => {
     setUrl(window.location.href)
     setServiceUrl(`${window.location.protocol}//<service-name>.${window.location.host}`)
+    setServiceResourceUrl(`${window.location.protocol}//${window.location.host}/services/<service-name>`)
   }, [])
 
   return (
@@ -35,6 +37,7 @@ const Instructions: FC = () => {
       </pre>
       <pre>&nbsp;&nbsp;KUBECONFIG=none kubectl create -f codius-service.yaml -s {url} --token="{requestId}"</pre>
       <pre>Deployed service will be available at {serviceUrl}</pre>
+      <pre>Service details can be found at {serviceResourceUrl}</pre>
     </div>
   )
 }
