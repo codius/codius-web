@@ -6,6 +6,8 @@ const Instructions: FC = () => {
   const [url, setUrl] = useState('')
   const [serviceUrl, setServiceUrl] = useState('')
   const [serviceResourceUrl, setServiceResourceUrl] = useState('')
+  const token = localStorage.getItem('deployToken') || requestId
+  localStorage.setItem('deployToken', token)
 
   useEffect(() => {
     setUrl(window.location.href)
@@ -35,7 +37,7 @@ const Instructions: FC = () => {
         kubectl
         </a>:
       </pre>
-      <pre>&nbsp;&nbsp;KUBECONFIG=none kubectl create -f codius-service.yaml -s {url} --token="{requestId}"</pre>
+      <pre>&nbsp;&nbsp;KUBECONFIG=none kubectl create -f codius-service.yaml -s {url} --token="{token}"</pre>
       <pre>Deployed service will be available at {serviceUrl}</pre>
       <pre>Service details can be found at {serviceResourceUrl}</pre>
     </div>

@@ -12,7 +12,7 @@ const WebMonetizationLoader: FC<WMLoaderProps> = (props) => {
 
   useEffect(() => {
     if (requestId && receipt) {
-      const id = props.balanceId || requestId
+      const id = props.balanceId || localStorage.getItem('deployToken') || requestId
       const submitReceipt = async () => {
         const res = await fetch(
           `${props.receiptVerifierUri}/balances/${id}:creditReceipt`,
