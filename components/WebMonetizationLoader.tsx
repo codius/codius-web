@@ -4,6 +4,7 @@ const { useMonetizationCounter } = require('react-web-monetization')
 interface WMLoaderProps {
   balanceId?: string,
   receiptVerifierUri: string
+  requestPrice: number
 }
 
 const WebMonetizationLoader: FC<WMLoaderProps> = (props) => {
@@ -21,8 +22,7 @@ const WebMonetizationLoader: FC<WMLoaderProps> = (props) => {
             body: receipt
           }
         )
-        if (res.ok) {
-          // should require a minimum returned balance?
+        if (res.ok && parseInt(await res.text()) >= props.requestPrice) {
           setPaid(true)
         }
       }
@@ -30,10 +30,14 @@ const WebMonetizationLoader: FC<WMLoaderProps> = (props) => {
     }
   }, [receipt])
 
+  if (!props.children) {
+    return null
+  }
+
   if (paid) {
     return <>{props.children}</>
   } else if (monetizationState === 'pending' || monetizationState === 'started') {
-    return <p>Awaiting Web Monetization...</p>
+    return <p>Awaiting <a href='https://webmonetization.org'>Web Monetization</a>...</p>
   } else {
     return <p>Pay with <a href='https://webmonetization.org'>Web Monetization</a> to access this Codius host.</p>
   }

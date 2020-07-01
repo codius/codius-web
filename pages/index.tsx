@@ -8,7 +8,8 @@ const { publicRuntimeConfig } = getConfig()
 
 interface IndexProps {
   receiptVerifierUri: string,
-  paymentPointer: string
+  paymentPointer: string,
+  requestPrice: number
 }
 
 const IndexPage: NextPage<IndexProps> = (props: IndexProps) => (
@@ -20,7 +21,7 @@ const IndexPage: NextPage<IndexProps> = (props: IndexProps) => (
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       <meta name='monetization' content={props.paymentPointer} />
     </Head>
-    <WebMonetizationLoader receiptVerifierUri={props.receiptVerifierUri}>
+    <WebMonetizationLoader receiptVerifierUri={props.receiptVerifierUri} requestPrice={props.requestPrice}>
       <Instructions/>
     </WebMonetizationLoader>
   </div>

@@ -14,6 +14,10 @@ PAYMENT_POINTER=$codius.example.com npm start
 
 ### Environment Variables
 
+#### CODIUS_HOST_URI
+* Type: String
+* Description: Root URI the Codius host
+
 #### PAYMENT_POINTER
 * Type: String
 * Description: Codius host's [payment pointer](https://paymentpointers.org/).
@@ -21,6 +25,10 @@ PAYMENT_POINTER=$codius.example.com npm start
 #### RECEIPT_VERIFIER_URI
 * Type: String
 * Description: Root URI of the [receipt verifier](https://github.com/coilhq/receipt-verifier)'s `balances` API.
+
+#### REQUEST_PRICE
+* Type: Number
+* Description: The amount required to have been paid to serve a request. Denominated in the host's asset (code and scale).
 
 ### Routes
 

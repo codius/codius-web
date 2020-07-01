@@ -1,4 +1,4 @@
-import Reload from '../../components/Reload'
+import Loading from '../../components/Loading'
 import WebMonetizationLoader from '../../components/WebMonetizationLoader'
 import { GetServerSideProps, NextPage, NextPageContext } from 'next'
 import getConfig from 'next/config'
@@ -7,14 +7,14 @@ import { useRouter } from 'next/router'
 
 const { publicRuntimeConfig } = getConfig()
 
-interface TopUpProps {
+interface LoadingProps {
   codiusHostURI: string,
   receiptVerifierUri: string,
   paymentPointer: string,
   requestPrice: number
 }
 
-const TopUpPage: NextPage<TopUpProps> = (props: TopUpProps) => {
+const LoadingPage: NextPage<LoadingProps> = (props: LoadingProps) => {
   const router = useRouter()
   const { id } = router.query
 
@@ -27,9 +27,8 @@ const TopUpPage: NextPage<TopUpProps> = (props: TopUpProps) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <meta name='monetization' content={props.paymentPointer} />
       </Head>
-      <WebMonetizationLoader receiptVerifierUri={props.receiptVerifierUri} balanceId={id as string} requestPrice={props.requestPrice}>
-        <Reload />
-      </WebMonetizationLoader>
+      <WebMonetizationLoader receiptVerifierUri={props.receiptVerifierUri} balanceId={id as string} requestPrice={props.requestPrice}/>
+      <Loading codiusHostURI={props.codiusHostURI} serviceName={id as string} />
     </div>
   )
 }
@@ -42,4 +41,4 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
   }
 }
 
-export default TopUpPage
+export default LoadingPage
