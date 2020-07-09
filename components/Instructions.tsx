@@ -22,12 +22,12 @@ const Instructions: FC = () => {
         Deploy a <a
           target="_blank"
           rel="noopener noreferrer"
-          href="https://godoc.org/github.com/codius/codius-crd-operator/api/v1alpha1#Service">
+          href="https://godoc.org/github.com/codius/codius-operator/api/v1alpha1#Service">
         Codius service
         </a> (see <a
           target="_blank"
           rel="noopener noreferrer"
-          href="https://github.com/codius/codius-crd-operator/blob/master/config/samples/core_v1alpha1_service.yaml">
+          href="https://github.com/codius/codius-operator/blob/master/config/samples/core_v1alpha1_service.yaml">
         sample
         </a>
         ) to this host using <a
