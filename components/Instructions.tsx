@@ -11,8 +11,8 @@ const Instructions: FC = () => {
 
   useEffect(() => {
     setUrl(window.location.href)
-    setServiceUrl(`${window.location.protocol}//<service-name>.${window.location.host}`)
-    setServiceResourceUrl(`${window.location.protocol}//${window.location.host}/services/<service-name>`)
+    setServiceUrl(`${window.location.protocol}//{name}.${window.location.host}`)
+    setServiceResourceUrl(`${window.location.protocol}//${window.location.host}/services/{name}`)
   }, [])
 
   return (
@@ -22,22 +22,17 @@ const Instructions: FC = () => {
         Deploy a <a
           target="_blank"
           rel="noopener noreferrer"
-          href="https://godoc.org/github.com/codius/codius-operator/api/v1alpha1#Service">
+          href="https://godoc.org/github.com/codius/codius-operator/servers#Service">
         Codius service
         </a> (see <a
           target="_blank"
           rel="noopener noreferrer"
-          href="https://github.com/codius/codius-operator/blob/master/config/samples/core_v1alpha1_service.yaml">
-        sample
+          href="https://github.com/codius/examples">
+        examples
         </a>
-        ) to this host using <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">
-        kubectl
-        </a>:
+        ) to this host:
       </pre>
-      <pre>&nbsp;&nbsp;KUBECONFIG=none kubectl create -f codius-service.yaml -s {url} --token="{token}"</pre>
+      <pre>&nbsp;&nbsp;curl -X PUT {url}services/{'{name}'} -H "Content-Type: application/json" -H "Authorization: Bearer {token}" -d @codius-service.json</pre>
       <pre>Deployed service will be available at {serviceUrl}</pre>
       <pre>Service details can be found at {serviceResourceUrl}</pre>
     </div>
