@@ -37,9 +37,9 @@ const WebMonetizationLoader: FC<WMLoaderProps> = (props) => {
   if (paid) {
     return <>{props.children}</>
   } else if (monetizationState === 'pending' || monetizationState === 'started') {
-    return <p>Awaiting <a href='https://webmonetization.org'>Web Monetization</a>...</p>
+    return <pre>Awaiting <a href='https://webmonetization.org'>Web Monetization</a>...</pre>
   } else {
-    return <p>Pay with <a href='https://webmonetization.org'>Web Monetization</a> to access this Codius host.</p>
+    return <pre>Pay with <a href='https://webmonetization.org'>Web Monetization</a> to access this Codius host.</pre>
   }
 }
 

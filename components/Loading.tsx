@@ -21,7 +21,7 @@ const Loading: FC<LoadingProps> = (props: LoadingProps) => {
     }, 1000)
   }, [])
 
-  return <p>Loading...</p>
+  return <pre>Loading...</pre>
 }
 
 export default Loading
