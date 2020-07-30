@@ -1,7 +1,13 @@
 import { FC, useState, useEffect } from 'react'
 import WebMonetizationLoader from './WebMonetizationLoader'
-import JSONInput from 'react-json-editor-ajrm'
-import locale    from 'react-json-editor-ajrm/locale/en'
+import { parse } from '@prantlf/jsonlint'
+import { dump, safeLoad } from 'js-yaml'
+import AceEditor, {IAnnotation} from 'react-ace'
+
+import 'ace-builds/src-noconflict/mode-json'
+import 'ace-builds/src-noconflict/mode-yaml'
+import 'ace-builds/src-noconflict/theme-github'
+
 const { useMonetizationState } = require('react-web-monetization')
 
 interface DeployProps {
@@ -62,8 +68,11 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
   const [token, setToken] = useState('')
   const [width, setWidth] = useState(1)
   const [ready, setReady] = useState(false)
-  const [service, setService] = useState(defaultService)
+  const [service, setService] = useState(dump(defaultService))
   const [deployedService, setDeployedService] = useState('')
+  const [mode, setMode] = useState('yaml')
+  const [prevMode, setPrevMode] = useState('yaml')
+  const [annotations, setAnnotations] = useState([])
 
   useEffect(() => {
     const token = localStorage.getItem('deployToken')
@@ -80,8 +89,22 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
   }, [requestId])
 
   useEffect(() => {
-    setReady(!!name && !!service && !!token)
-  }, [name, service, token])
+    if (mode !== prevMode) {
+      switch (mode) {
+        case 'json':
+          setService(JSON.stringify(safeLoad(service), null, 2))
+          break;
+        case 'yaml':
+          setService(dump(JSON.parse(service)))
+          break;
+      }
+      setPrevMode(mode)
+    }
+  }, [mode])
+
+  useEffect(() => {
+    setReady(!!name && !annotations.length && !!token)
+  }, [name, annotations, token])
 
   const deployService = async () => {
     const res = await fetch(
@@ -92,7 +115,7 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(service)
+        body: mode === 'json' ? service : JSON.stringify(safeLoad(service))
       }
     )
     if (res.ok) {
@@ -135,6 +158,42 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
     setWidth(value.length || 1)
   }
 
+  const updateService = (value) => {
+    setService(value)
+    switch (mode) {
+      case 'json':
+        try {
+          parse(value, {
+            allowSingleQuotedStrings: true
+          })
+          setAnnotations([])
+        } catch (err) {
+          const annotation: IAnnotation = {
+            column: err.location.start.column,
+            row: err.location.start.line-1,
+            text: err.reason,
+            type: 'error'
+          }
+          setAnnotations([annotation])
+        }
+        break;
+      case 'yaml':
+        try {
+          safeLoad(value)
+          setAnnotations([])
+        } catch (err) {
+          const annotation: IAnnotation = {
+            column: err.mark.column,
+            row: err.mark.line,
+            text: err.reason,
+            type: 'error'
+          }
+          setAnnotations([annotation])
+        }
+        break;
+    }
+  }
+
   return (
     <div>
       <p></p>
@@ -159,12 +218,22 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
         .{host}
         </a>:
       </p>
-      <JSONInput
-        id          = 'a_unique_id'
-        placeholder = { defaultService }
-        locale      = { locale }
-        height      = '500px'
-        onChange    = { (o) => setService(o.jsObject) }
+      <select value={mode} disabled={!!annotations.length} onChange={(e) => setMode(e.target.value)}>
+        <option value="json">JSON</option>
+        <option value="yaml">YAML</option>
+      </select>
+      <AceEditor
+        mode={ mode }
+        theme="github"
+        value={ service }
+        tabSize={2}
+        fontSize={14}
+        maxLines={42}
+        minLines={10}
+        onChange={updateService}
+        annotations={annotations}
+        setOptions={{ useWorker: false }}
+        editorProps={{ $blockScrolling: true }}
       />
       <p>
         <a
