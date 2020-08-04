@@ -252,10 +252,7 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
             <pre>Success</pre>
             <pre>{JSON.stringify(deployedService, null, 2)}</pre>
           </div>
-        : <div>
-            <p>Or from the command line with:</p>
-            <pre>curl -X PUT {hostUrl.href}services/{name || '{name}'} -H "Content-Type: application/json" -H "Authorization: Bearer {token || '{token}'}" -d @codius-service.json</pre>
-          </div>
+        : <p></p>
       }
     </div>
   )
