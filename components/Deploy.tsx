@@ -63,16 +63,16 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
 
   const { requestId } = useMonetizationState()
 
-  const [error, setError] = useState('')
   const [name, setName] = useState('')
+  const [url, setUrl] = useState(`${protocol}//${name ? name + '.' : ''}${host}`)
   const [token, setToken] = useState('')
-  const [width, setWidth] = useState(1)
   const [ready, setReady] = useState(false)
   const [service, setService] = useState(dump(defaultService))
-  const [deployedService, setDeployedService] = useState('')
+  const [result, setResult] = useState('')
   const [mode, setMode] = useState('yaml')
   const [prevMode, setPrevMode] = useState('yaml')
   const [annotations, setAnnotations] = useState([])
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('deployToken')
@@ -87,6 +87,10 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
       localStorage.setItem('deployToken', requestId)
     }
   }, [requestId])
+
+  useEffect(() => {
+    setUrl(`${protocol}//${name ? name + '.' : ''}${host}`)
+  }, [name])
 
   useEffect(() => {
     if (mode !== prevMode) {
@@ -119,22 +123,20 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
       }
     )
     if (res.ok) {
-      setError('')
-      setDeployedService(await getService(name))
+      setResult(`Success\n\n${JSON.stringify(await getService(name), null, 2)}`)
     } else {
-      setDeployedService('')
       switch (res.status) {
         case 400:
-          setError('Invalid service')
+          setResult('Invalid service')
           break;
         case 402:
-          setError('Payment required')
+          setResult('Payment required')
           break;
         case 403:
-          setError('Service name is unavailable')
+          setResult('Service name is unavailable')
           break;
         default:
-          setError('Unable to deploy service')
+          setResult('Unable to deploy service')
       }
     }
   }
@@ -151,11 +153,6 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
     } else {
       return ''
     }
-  }
-
-  const updateName = (value) => {
-    setName(value)
-    setWidth(value.length || 1)
   }
 
   const updateService = (value) => {
@@ -196,28 +193,19 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
 
   return (
     <div>
-      <p></p>
       <p>
-        Deploy a <a
+        Create a <a
           target="_blank"
           rel="noopener noreferrer"
           href="https://godoc.org/github.com/codius/codius-operator/servers#Service">
-        Codius service
-        </a> at <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href={`${protocol}//${name}.${host}`}>
-        {protocol}//
+          Codius service
         </a>
-        <input
-          type="text" size={width} autoFocus onChange={(e) => updateName(e.target.value)}
-        /><a
-          target="_blank"
-          rel="noopener noreferrer"
-          href={`${protocol}//${name}.${host}`}>
-        .{host}
-        </a>:
       </p>
+      <pre>
+        Name: <input
+          type="text" autoFocus autoComplete="off" onChange={(e) => setName(e.target.value)}
+        />
+      </pre>
       <select value={mode} disabled={!!annotations.length} onChange={(e) => setMode(e.target.value)}>
         <option value="json">JSON</option>
         <option value="yaml">YAML</option>
@@ -235,25 +223,38 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
         setOptions={{ useWorker: false }}
         editorProps={{ $blockScrolling: true }}
       />
-      <p>
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href='https://webmonetization.org'>
-        Web Monetization
-        </a> payment token: <input
-          type="text" value={token} size={30} onChange={(e) => setToken(e.target.value)}
-        />
-      </p>
-      <input type="button" disabled={!ready} value="Deploy" onClick={(e) => deployService()}/>
-      <pre>{error}</pre>
-      {deployedService
-        ? <div>
-            <pre>Success</pre>
-            <pre>{JSON.stringify(deployedService, null, 2)}</pre>
-          </div>
+      <pre onClick={(e) => setShowAdvanced(!showAdvanced)} style={{cursor: "pointer"}}>[{showAdvanced ? '-' : '+'}] Advanced</pre>
+      {showAdvanced
+        ? <pre>
+            &nbsp;&nbsp;&nbsp;&nbsp;<a
+              target="_blank"
+              rel="noopener noreferrer"
+              href='https://webmonetization.org'>
+            Web Monetization
+            </a> payment token: <input
+              type="text" value={token} autoComplete="off" size={30} onChange={(e) => setToken(e.target.value)}
+            />
+            <br/>
+          </pre>
         : <p></p>
       }
+      <br/>
+      <input type="button" disabled={!ready} value="Deploy" autoComplete="off" onClick={(e) => deployService()}/> to <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href={url}>
+        {url}
+      </a>
+      <pre>
+        {!token ?
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href='https://webmonetization.org'>
+            Payment required
+          </a> : <p></p>}
+      </pre>
+      <pre>{result}</pre>
     </div>
   )
 }
