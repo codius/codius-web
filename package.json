@@ -5,7 +5,21 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "format": "npm run prettier && npm run lint --fix --quiet",
+    "lint": "eslint . --ext .tsx",
+    "lint:fix": "npm run lint -- --fix",
+    "precommit": "lint-staged",
+    "prettier": "prettier --write './**/*.{tsx,md}'",
     "start": "next start"
+  },
+  "lint-staged": {
+    "*.{md}": [
+      "prettier --write"
+    ],
+    "*.tsx": [
+      "prettier --write",
+      "npm run lint --fix"
+    ]
   },
   "dependencies": {
     "@prantlf/jsonlint": "^10.2.0",
@@ -20,6 +34,18 @@
   "devDependencies": {
     "@types/node": "^13.5.0",
     "@types/react": "^16.9.19",
-    "typescript": "^3.7.5"
+    "@typescript-eslint/eslint-plugin": "^3.8.0",
+    "@typescript-eslint/parser": "^3.8.0",
+    "eslint": "^7.6.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.20.5",
+    "eslint-plugin-react-hooks": "^4.0.8",
+    "eslint-plugin-standard": "^4.0.1",
+    "prettier": "^2.0.5",
+    "typescript": "^3.9.7"
   }
 }

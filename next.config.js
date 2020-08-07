@@ -12,7 +12,7 @@ module.exports = {
     requestPrice: parseInt(process.env.REQUEST_PRICE) || 1
   },
   experimental: {
-    async headers() {
+    async headers () {
       return [
         {
           source: '/(.*)?',
@@ -24,7 +24,7 @@ module.exports = {
             {
               key: 'Access-Control-Allow-Methods',
               value: 'GET'
-            },
+            }
           ]
         }
       ]

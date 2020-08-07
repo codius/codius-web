@@ -1,59 +1,54 @@
-import { FC, useState, useEffect } from 'react'
-import WebMonetizationLoader from './WebMonetizationLoader'
+import React, { FC, useState, useEffect } from 'react'
 import { parse } from '@prantlf/jsonlint'
 import { dump, safeLoad } from 'js-yaml'
-import AceEditor, {IAnnotation} from 'react-ace'
+import AceEditor, { IAnnotation } from 'react-ace'
+import { useMonetizationState } from 'react-web-monetization'
 
 import 'ace-builds/src-noconflict/mode-json'
 import 'ace-builds/src-noconflict/mode-yaml'
 import 'ace-builds/src-noconflict/theme-github'
 
-const { useMonetizationState } = require('react-web-monetization')
-
 interface DeployProps {
   codiusHostURI: string
 }
 
-const Deploy: FC<DeployProps> = (props: DeployProps) => {
+export const Deploy: FC<DeployProps> = (props: DeployProps) => {
   const defaultService = {
     spec: {
       containers: [
         {
-          name: "app",
-          image: "nginx@sha256:3e2ffcf0edca2a4e9b24ca442d227baea7b7f0e33ad654ef1eb806fbd9bedcf0",
-          command: [
-            "nginx",
-            "-g",
-            "daemon off;"
-          ],
+          name: 'app',
+          image:
+            'nginx@sha256:3e2ffcf0edca2a4e9b24ca442d227baea7b7f0e33ad654ef1eb806fbd9bedcf0',
+          command: ['nginx', '-g', 'daemon off;'],
           env: [
             {
-              name: "PUBLIC_VARIABLE",
-              value: "hello world"
+              name: 'PUBLIC_VARIABLE',
+              value: 'hello world'
             },
             {
-              name: "PRIVATE_VARIABLE",
+              name: 'PRIVATE_VARIABLE',
               valueFrom: {
                 secretKeyRef: {
-                  key: "password"
+                  key: 'password'
                 }
               }
             }
           ],
           readinessProbe: {
             httpGet: {
-              path: "/",
+              path: '/',
               port: 80
             },
-            failureThreshold: 10,
+            failureThreshold: 10
           }
         }
       ],
       port: 80
     },
     secretData: {
-      nonce: "123456789abcdef",
-      password: "super secret"
+      nonce: '123456789abcdef',
+      password: 'super secret'
     }
   }
 
@@ -64,7 +59,9 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
   const { requestId } = useMonetizationState()
 
   const [name, setName] = useState('')
-  const [url, setUrl] = useState(`${protocol}//${name ? name + '.' : ''}${host}`)
+  const [url, setUrl] = useState(
+    `${protocol}//${name !== '' ? name + '.' : ''}${host}`
+  )
   const [token, setToken] = useState('')
   const [ready, setReady] = useState(false)
   const [service, setService] = useState(dump(defaultService))
@@ -76,20 +73,20 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
 
   useEffect(() => {
     const token = localStorage.getItem('deployToken')
-    if (token) {
+    if (token !== null) {
       setToken(token)
     }
   }, [])
 
   useEffect(() => {
-    if (requestId && !localStorage.getItem('deployToken')) {
+    if (requestId !== null && localStorage.getItem('deployToken') === null) {
       setToken(requestId)
       localStorage.setItem('deployToken', requestId)
     }
   }, [requestId])
 
   useEffect(() => {
-    setUrl(`${protocol}//${name ? name + '.' : ''}${host}`)
+    setUrl(`${protocol}//${name !== '' ? name + '.' : ''}${host}`)
   }, [name])
 
   useEffect(() => {
@@ -97,65 +94,59 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
       switch (mode) {
         case 'json':
           setService(JSON.stringify(safeLoad(service), null, 2))
-          break;
+          break
         case 'yaml':
           setService(dump(JSON.parse(service)))
-          break;
+          break
       }
       setPrevMode(mode)
     }
   }, [mode])
 
   useEffect(() => {
-    setReady(!!name && !annotations.length && !!token)
+    setReady(name !== '' && annotations.length !== 0 && token !== '')
   }, [name, annotations, token])
 
-  const deployService = async () => {
-    const res = await fetch(
-      `${hostUrl.href}services/${name}`,
-      {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: mode === 'json' ? service : JSON.stringify(safeLoad(service))
-      }
-    )
+  const deployService = async (): Promise<void> => {
+    const res = await fetch(`${hostUrl.href}services/${name}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: mode === 'json' ? service : JSON.stringify(safeLoad(service))
+    })
     if (res.ok) {
       setResult(`Success\n\n${JSON.stringify(await getService(name), null, 2)}`)
     } else {
       switch (res.status) {
         case 400:
           setResult('Invalid service')
-          break;
+          break
         case 402:
           setResult('Payment required')
-          break;
+          break
         case 403:
           setResult('Service name is unavailable')
-          break;
+          break
         default:
           setResult('Unable to deploy service')
       }
     }
   }
 
-  const getService = async (name) => {
-    const res = await fetch(
-      `${hostUrl.href}services/${name}`,
-      {
-        method: 'GET'
-      }
-    )
+  const getService = async (name: string): Promise<string> => {
+    const res = await fetch(`${hostUrl.href}services/${name}`, {
+      method: 'GET'
+    })
     if (res.ok) {
-      return res.json()
+      return await res.json()
     } else {
       return ''
     }
   }
 
-  const updateService = (value) => {
+  const updateService = (value): void => {
     setService(value)
     switch (mode) {
       case 'json':
@@ -167,13 +158,13 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
         } catch (err) {
           const annotation: IAnnotation = {
             column: err.location.start.column,
-            row: err.location.start.line-1,
+            row: err.location.start.line - 1,
             text: err.reason,
             type: 'error'
           }
           setAnnotations([annotation])
         }
-        break;
+        break
       case 'yaml':
         try {
           safeLoad(value)
@@ -187,33 +178,43 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
           }
           setAnnotations([annotation])
         }
-        break;
+        break
     }
   }
 
   return (
     <div>
       <p>
-        Create a <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://godoc.org/github.com/codius/codius-operator/servers#Service">
+        Create a{' '}
+        <a
+          target='_blank'
+          rel='noopener noreferrer'
+          href='https://godoc.org/github.com/codius/codius-operator/servers#Service'
+        >
           Codius service
         </a>
       </p>
       <pre>
-        Name: <input
-          type="text" autoFocus autoComplete="off" onChange={(e) => setName(e.target.value)}
+        Name:{' '}
+        <input
+          type='text'
+          autoFocus
+          autoComplete='off'
+          onChange={e => setName(e.target.value)}
         />
       </pre>
-      <select value={mode} disabled={!!annotations.length} onChange={(e) => setMode(e.target.value)}>
-        <option value="json">JSON</option>
-        <option value="yaml">YAML</option>
+      <select
+        value={mode}
+        disabled={annotations.length !== 0}
+        onChange={e => setMode(e.target.value)}
+      >
+        <option value='json'>JSON</option>
+        <option value='yaml'>YAML</option>
       </select>
       <AceEditor
-        mode={ mode }
-        theme="github"
-        value={ service }
+        mode={mode}
+        theme='github'
+        value={service}
         tabSize={2}
         fontSize={14}
         maxLines={42}
@@ -223,40 +224,63 @@ const Deploy: FC<DeployProps> = (props: DeployProps) => {
         setOptions={{ useWorker: false }}
         editorProps={{ $blockScrolling: true }}
       />
-      <pre onClick={(e) => setShowAdvanced(!showAdvanced)} style={{cursor: "pointer"}}>[{showAdvanced ? '-' : '+'}] Advanced</pre>
-      {showAdvanced
-        ? <pre>
-            &nbsp;&nbsp;&nbsp;&nbsp;<a
-              target="_blank"
-              rel="noopener noreferrer"
-              href='https://webmonetization.org'>
+      <pre
+        onClick={e => setShowAdvanced(!showAdvanced)}
+        style={{ cursor: 'pointer' }}
+      >
+        [{showAdvanced ? '-' : '+'}] Advanced
+      </pre>
+      {showAdvanced ? (
+        <pre>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <a
+            target='_blank'
+            rel='noopener noreferrer'
+            href='https://webmonetization.org'
+          >
             Web Monetization
-            </a> payment token: <input
-              type="text" value={token} autoComplete="off" size={30} onChange={(e) => setToken(e.target.value)}
-            />
-            <br/>
-          </pre>
-        : <p></p>
-      }
-      <br/>
-      <input type="button" disabled={!ready} value="Deploy" autoComplete="off" onClick={(e) => deployService()}/> to <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href={url}>
+          </a>{' '}
+          payment token:{' '}
+          <input
+            type='text'
+            value={token}
+            autoComplete='off'
+            size={30}
+            onChange={e => setToken(e.target.value)}
+          />
+          <br />
+        </pre>
+      ) : (
+        <p></p>
+      )}
+      <br />
+      <input
+        type='button'
+        disabled={!ready}
+        value='Deploy'
+        autoComplete='off'
+        onClick={async () => {
+          await deployService()
+        }}
+      />{' '}
+      to{' '}
+      <a target='_blank' rel='noopener noreferrer' href={url}>
         {url}
       </a>
       <pre>
-        {!token ?
+        {token === '' ? (
           <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href='https://webmonetization.org'>
+            target='_blank'
+            rel='noopener noreferrer'
+            href='https://webmonetization.org'
+          >
             Payment required
-          </a> : <p></p>}
+          </a>
+        ) : (
+          <p></p>
+        )}
       </pre>
       <pre>{result}</pre>
     </div>
   )
 }
-
-export default Deploy

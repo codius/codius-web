@@ -1,22 +1,27 @@
 import { FC, useEffect, useState } from 'react'
-const { useMonetizationCounter } = require('react-web-monetization')
+import { useMonetizationCounter } from 'react-web-monetization'
 
 interface WMLoaderProps {
-  balanceId?: string,
+  balanceId?: string
   receiptVerifierUri: string
   requestPrice: number
 }
 
-const WebMonetizationLoader: FC<WMLoaderProps> = (props) => {
-  const { state: monetizationState, requestId, receipt } = useMonetizationCounter()
+export const WebMonetizationLoader: FC<WMLoaderProps> = props => {
+  const {
+    state: monetizationState,
+    requestId,
+    receipt
+  } = useMonetizationCounter()
   const [paid, setPaid] = useState(false)
 
   useEffect(() => {
-    if (requestId && receipt) {
-      const id = props.balanceId || localStorage.getItem('deployToken') || requestId
-      const submitReceipt = async () => {
+    if (requestId !== null && receipt !== null) {
+      const id =
+        props.balanceId || localStorage.getItem('deployToken') || requestId
+      const submitReceipt = async (): Promise<void> => {
         const res = await fetch(
-          `${props.receiptVerifierUri}/balances/${id}:creditReceipt`,
+          `${props.receiptVerifierUri}/balances/${id as string}:creditReceipt`,
           {
             method: 'POST',
             body: receipt
@@ -26,21 +31,31 @@ const WebMonetizationLoader: FC<WMLoaderProps> = (props) => {
           setPaid(true)
         }
       }
-      submitReceipt()
+      void submitReceipt()
     }
   }, [receipt])
 
-  if (!props.children) {
+  if (props.children === null) {
     return null
   }
 
   if (paid) {
     return <>{props.children}</>
-  } else if (monetizationState === 'pending' || monetizationState === 'started') {
-    return <pre>Awaiting <a href='https://webmonetization.org'>Web Monetization</a>...</pre>
+  } else if (
+    monetizationState === 'pending' ||
+    monetizationState === 'started'
+  ) {
+    return (
+      <pre>
+        Awaiting <a href='https://webmonetization.org'>Web Monetization</a>...
+      </pre>
+    )
   } else {
-    return <pre>Pay with <a href='https://webmonetization.org'>Web Monetization</a> to access this Codius host.</pre>
+    return (
+      <pre>
+        Pay with <a href='https://webmonetization.org'>Web Monetization</a> to
+        access this Codius host.
+      </pre>
+    )
   }
 }
-
-export default WebMonetizationLoader

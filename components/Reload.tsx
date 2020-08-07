@@ -1,11 +1,9 @@
 import { FC, useEffect } from 'react'
 
-const Reload: FC = () => {
+export const Reload: FC = () => {
   useEffect(() => {
     window.location.reload(true)
   }, [])
 
   return null
 }
-
-export default Reload
