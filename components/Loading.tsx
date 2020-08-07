@@ -7,7 +7,7 @@ interface LoadingProps {
 
 export const Loading: FC<LoadingProps> = (props: LoadingProps) => {
   useEffect(() => {
-    async function reloadIfAvailable (): Promise<void> {
+    async function reloadIfAvailable(): Promise<void> {
       const res = await fetch(
         `${props.codiusHostURI}/services/${props.serviceName}`
       )

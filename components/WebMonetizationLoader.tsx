@@ -1,45 +1,20 @@
-import { FC, useEffect, useState } from 'react'
+import { FC } from 'react'
+import { useRecoilValue } from 'recoil'
 import { useMonetizationCounter } from 'react-web-monetization'
 
+import { balanceState } from './ReceiptSubmitter'
+
 interface WMLoaderProps {
-  balanceId?: string
-  receiptVerifierUri: string
   requestPrice: number
 }
 
-export const WebMonetizationLoader: FC<WMLoaderProps> = props => {
-  const {
-    state: monetizationState,
-    requestId,
-    receipt
-  } = useMonetizationCounter()
-  const [paid, setPaid] = useState(false)
+export const WebMonetizationLoader: FC<WMLoaderProps> = (
+  props: React.PropsWithChildren<WMLoaderProps>
+) => {
+  const { state: monetizationState } = useMonetizationCounter()
+  const balance = useRecoilValue(balanceState)
 
-  useEffect(() => {
-    if (requestId !== null && receipt !== null) {
-      const id =
-        props.balanceId || localStorage.getItem('deployToken') || requestId
-      const submitReceipt = async (): Promise<void> => {
-        const res = await fetch(
-          `${props.receiptVerifierUri}/balances/${id as string}:creditReceipt`,
-          {
-            method: 'POST',
-            body: receipt
-          }
-        )
-        if (res.ok && parseInt(await res.text()) >= props.requestPrice) {
-          setPaid(true)
-        }
-      }
-      void submitReceipt()
-    }
-  }, [receipt])
-
-  if (props.children === null) {
-    return null
-  }
-
-  if (paid) {
+  if (balance >= props.requestPrice) {
     return <>{props.children}</>
   } else if (
     monetizationState === 'pending' ||

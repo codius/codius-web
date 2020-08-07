@@ -1,9 +1,13 @@
+import { RecoilRoot } from 'recoil'
 import { GetServerSideProps, NextPage } from 'next'
 import getConfig from 'next/config'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-import { WebMonetizationLoader } from '../../components/WebMonetizationLoader'
+import {
+  ReceiptSubmitter,
+  balanceIdState
+} from '../../components/ReceiptSubmitter'
+import { Head } from '../../components/Head'
 import { Loading } from '../../components/Loading'
 
 const { publicRuntimeConfig } = getConfig()
@@ -19,22 +23,16 @@ const LoadingPage: NextPage<LoadingProps> = (props: LoadingProps) => {
   const router = useRouter()
   const { id } = router.query
 
+  const initializeState = ({ set }): void => {
+    set(balanceIdState, id as string)
+  }
+
   return (
-    <div>
-      <Head>
-        <title>Codius Host</title>
-        <link rel='icon' href={props.codiusHostURI + '/favicon.ico'} />
-        <meta charSet='utf-8' />
-        <meta name='viewport' content='initial-scale=1.0, width=device-width' />
-        <meta name='monetization' content={props.paymentPointer} />
-      </Head>
-      <WebMonetizationLoader
-        receiptVerifierUri={props.receiptVerifierUri}
-        balanceId={id as string}
-        requestPrice={props.requestPrice}
-      />
+    <RecoilRoot initializeState={initializeState}>
+      <Head paymentPointer={props.paymentPointer} />
+      <ReceiptSubmitter receiptVerifierUri={props.receiptVerifierUri} />
       <Loading codiusHostURI={props.codiusHostURI} serviceName={id as string} />
-    </div>
+    </RecoilRoot>
   )
 }
 

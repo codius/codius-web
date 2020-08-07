@@ -1,9 +1,13 @@
+import { RecoilRoot } from 'recoil'
 import { GetServerSideProps, NextPage } from 'next'
-import React from 'react'
 import getConfig from 'next/config'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 
+import {
+  ReceiptSubmitter,
+  balanceIdState
+} from '../../components/ReceiptSubmitter'
+import { Head } from '../../components/Head'
 import { WebMonetizationLoader } from '../../components/WebMonetizationLoader'
 import { Reload } from '../../components/Reload'
 
@@ -18,25 +22,19 @@ interface TopUpProps {
 
 const TopUpPage: NextPage<TopUpProps> = (props: TopUpProps) => {
   const router = useRouter()
-  const { id } = router.query
+
+  const initializeState = ({ set }): void => {
+    set(balanceIdState, router.query.id as string)
+  }
 
   return (
-    <div>
-      <Head>
-        <title>Codius Host</title>
-        <link rel='icon' href={props.codiusHostURI + '/favicon.ico'} />
-        <meta charSet='utf-8' />
-        <meta name='viewport' content='initial-scale=1.0, width=device-width' />
-        <meta name='monetization' content={props.paymentPointer} />
-      </Head>
-      <WebMonetizationLoader
-        receiptVerifierUri={props.receiptVerifierUri}
-        balanceId={id as string}
-        requestPrice={props.requestPrice}
-      >
+    <RecoilRoot initializeState={initializeState}>
+      <Head paymentPointer={props.paymentPointer} />
+      <ReceiptSubmitter receiptVerifierUri={props.receiptVerifierUri} />
+      <WebMonetizationLoader requestPrice={props.requestPrice}>
         <Reload />
       </WebMonetizationLoader>
-    </div>
+    </RecoilRoot>
   )
 }
 

@@ -29,7 +29,9 @@
     "react": "16.12.0",
     "react-ace": "^9.1.1",
     "react-dom": "16.12.0",
-    "react-web-monetization": "0.0.13"
+    "react-string-replace": "^0.4.4",
+    "react-web-monetization": "0.0.13",
+    "recoil": "0.0.10"
   },
   "devDependencies": {
     "@types/node": "^13.5.0",

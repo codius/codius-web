@@ -1,9 +1,16 @@
-import { NextPage, NextPageContext } from 'next'
+import { RecoilRoot } from 'recoil'
+import { GetServerSideProps, NextPage } from 'next'
 import getConfig from 'next/config'
-import Head from 'next/head'
 
-import { WebMonetizationLoader } from '../components/WebMonetizationLoader'
-import { Deploy } from '../components/Deploy'
+import { Advanced } from '../components/Advanced'
+import { DeployButton } from '../components/DeployButton'
+import { DeployResult } from '../components/DeployResult'
+import { Editor } from '../components/Editor'
+import { Head } from '../components/Head'
+import { NameField } from '../components/NameField'
+import { PaymentRequired } from '../components/PaymentRequired'
+import { ReceiptSubmitter } from '../components/ReceiptSubmitter'
+import { TokenField, initializeTokenState } from '../components/TokenField'
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -11,28 +18,40 @@ interface IndexProps {
   codiusHostURI: string
   receiptVerifierUri: string
   paymentPointer: string
-  requestPrice: number
 }
 
 const IndexPage: NextPage<IndexProps> = (props: IndexProps) => (
-  <div>
-    <Head>
-      <title>Codius Host</title>
-      <link rel='icon' href='/favicon.ico' />
-      <meta charSet='utf-8' />
-      <meta name='viewport' content='initial-scale=1.0, width=device-width' />
-      <meta name='monetization' content={props.paymentPointer} />
-    </Head>
-    <WebMonetizationLoader
-      receiptVerifierUri={props.receiptVerifierUri}
-      requestPrice={props.requestPrice}
-    />
-    <Deploy codiusHostURI={props.codiusHostURI} />
-  </div>
+  <RecoilRoot initializeState={initializeTokenState}>
+    <Head paymentPointer={props.paymentPointer} />
+    <ReceiptSubmitter receiptVerifierUri={props.receiptVerifierUri} />
+    <p>
+      Create a serverless{' '}
+      <a
+        target='_blank'
+        rel='noopener noreferrer'
+        href='https://godoc.org/github.com/codius/codius-operator/servers#Service'
+      >
+        Codius service
+      </a>
+    </p>
+    <NameField />
+    <Editor />
+    <Advanced>
+      <TokenField />
+    </Advanced>
+    <br />
+    <DeployButton codiusHostURI={props.codiusHostURI} />
+    <PaymentRequired />
+    <DeployResult codiusHostURI={props.codiusHostURI} />
+  </RecoilRoot>
 )
 
-IndexPage.getInitialProps = async (ctx: NextPageContext) => {
-  return publicRuntimeConfig
+export const getServerSideProps: GetServerSideProps = async ctx => {
+  return {
+    props: {
+      ...publicRuntimeConfig
+    }
+  }
 }
 
 export default IndexPage
