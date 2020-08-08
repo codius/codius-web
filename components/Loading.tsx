@@ -16,9 +16,12 @@ export const Loading: FC<LoadingProps> = (props: LoadingProps) => {
         window.location.reload(true)
       }
     }
-    setInterval((): void => {
+    const interval = setInterval((): void => {
       void reloadIfAvailable()
     }, 1000)
+    return (): void => {
+      clearInterval(interval)
+    }
   }, [])
 
   return <pre>Loading...</pre>
