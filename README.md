@@ -40,12 +40,22 @@ PAYMENT_POINTER=$codius.example.com npm start
 
 Codius host's service deployment page.
 
-This page is web-monetized. Deployment instructions are displayed when payment is verified (by successfully crediting receipt(s) to the web monetization request id balance at the [receipt verifier](https://github.com/coilhq/receipt-verifier)).
+This page is web-monetized, and receipts are credited to the web monetization request id balance at the [`RECEIPT_VERIFIER_URI`](#receipt_verifier_uri).
 
-The balance is expected to be debited by the Codius host's [authentication token webhook](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#webhook-token-authentication) ([implementation](https://github.com/wilsonianb/codius-token-auth-webhook)) when the CREATE request is made to the Kubernetes API server.
+The balance is expected to be debited by the Codius host services are submitted to the [`/services` API](https://github.com/codius/codius-operator/blob/master/README.md#api-documentation).
 
 #### `/{ID}/402`
 
 Codius service balance reload page.
 
-This page is web-monetized. The total paid amount and a link to the Codius service are displayed when payment is verified (by successfully crediting receipt(s) to the Codius service's balance at the [receipt verifier](https://github.com/coilhq/receipt-verifier)).
+This page is web-monetized, and receipts are credited to the service's balance at the [`RECEIPT_VERIFIER_URI`](#receipt_verifier_uri).
+
+The pages reloads when the balance exceeds the [`REQUEST_PRICE`](#request_price).
+
+#### `/{ID}/503`
+
+Codius service loading page.
+
+This page is web-monetized, and receipts are credited to the service's balance at the [`RECEIPT_VERIFIER_URI`](#receipt_verifier_uri).
+
+The page checks the service's status via the [`/services` API](https://github.com/codius/codius-operator/blob/master/README.md#api-documentation) and reloads when the service is available.
