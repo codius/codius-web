@@ -16,20 +16,6 @@ const defaultService = {
         image:
           'nginx@sha256:3e2ffcf0edca2a4e9b24ca442d227baea7b7f0e33ad654ef1eb806fbd9bedcf0',
         command: ['nginx', '-g', 'daemon off;'],
-        env: [
-          {
-            name: 'PUBLIC_VARIABLE',
-            value: 'hello world'
-          },
-          {
-            name: 'PRIVATE_VARIABLE',
-            valueFrom: {
-              secretKeyRef: {
-                key: 'password'
-              }
-            }
-          }
-        ],
         readinessProbe: {
           httpGet: {
             path: '/',
@@ -37,13 +23,36 @@ const defaultService = {
           },
           failureThreshold: 10
         }
+      },
+      {
+        name: 'web-monetization-proxy',
+        image:
+          'downey/web-monetization-proxy:kbld-rand-1591491522525640000-206312007170',
+        env: [
+          {
+            name: 'PROXY_PORT',
+            value: '8080'
+          },
+          {
+            name: 'BACKEND_PORT',
+            value: '80'
+          },
+          {
+            name: 'PAYMENT_POINTER',
+            valueFrom: {
+              secretKeyRef: {
+                key: 'PAYMENT_POINTER'
+              }
+            }
+          }
+        ]
       }
     ],
-    port: 80
+    port: 8080
   },
   secretData: {
     nonce: '123456789abcdef',
-    password: 'super secret'
+    PAYMENT_POINTER: '$wallet.example.com/your-wallet-here'
   }
 }
 
@@ -81,12 +90,25 @@ export const serviceState = selector({
   }
 })
 
-export const Editor: FC = () => {
+interface EditorProps {
+  paymentPointer: string
+}
+
+export const Editor: FC<EditorProps> = (props: EditorProps) => {
   const [annotations, setAnnotations] = useRecoilState(annotationsState)
   const [mode, setMode] = useRecoilState(modeState)
   const [newMode, setNewMode] = useState(mode)
   const [serviceStr, setServiceStr] = useRecoilState(serviceStrState)
   const valid = useRecoilValue(serviceValidState)
+
+  useEffect(() => {
+    const service =
+      mode === 'yaml' ? fromYaml(serviceStr) : JSON.parse(serviceStr)
+    service.secretData.PAYMENT_POINTER = props.paymentPointer
+    setServiceStr(
+      mode === 'yaml' ? toYaml(service) : JSON.stringify(service, null, 2)
+    )
+  }, [])
 
   useEffect(() => {
     if (mode !== newMode) {
