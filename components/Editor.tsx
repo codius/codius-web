@@ -4,9 +4,14 @@ import { parse } from '@prantlf/jsonlint'
 import { dump as toYaml, safeLoad as fromYaml } from 'js-yaml'
 import AceEditor, { IAnnotation } from 'react-ace'
 
+import { nameState } from './NameField'
+
 import 'ace-builds/src-noconflict/mode-json'
 import 'ace-builds/src-noconflict/mode-yaml'
 import 'ace-builds/src-noconflict/theme-github'
+
+const PROXY_PAYMENT_POINTER = 'PROXY_PAYMENT_POINTER'
+const PROXY_RECEIPTS_URL = 'PROXY_RECEIPTS_URL'
 
 const defaultService = {
   spec: {
@@ -26,8 +31,7 @@ const defaultService = {
       },
       {
         name: 'web-monetization-proxy',
-        image:
-          'downey/web-monetization-proxy:kbld-rand-1591491522525640000-206312007170',
+        image: 'wilsonianbcoil/web-monetization-proxy',
         env: [
           {
             name: 'PROXY_PORT',
@@ -44,6 +48,10 @@ const defaultService = {
                 key: 'PAYMENT_POINTER'
               }
             }
+          },
+          {
+            name: 'RECEIPT_SUBMISSION_URL',
+            value: PROXY_RECEIPTS_URL
           }
         ]
       }
@@ -52,7 +60,7 @@ const defaultService = {
   },
   secretData: {
     nonce: '123456789abcdef',
-    PAYMENT_POINTER: '$wallet.example.com/your-wallet-here'
+    PAYMENT_POINTER: PROXY_PAYMENT_POINTER
   }
 }
 
@@ -92,23 +100,40 @@ export const serviceState = selector({
 
 interface EditorProps {
   paymentPointer: string
+  receiptVerifierUri: string
 }
 
 export const Editor: FC<EditorProps> = (props: EditorProps) => {
   const [annotations, setAnnotations] = useRecoilState(annotationsState)
   const [mode, setMode] = useRecoilState(modeState)
   const [newMode, setNewMode] = useState(mode)
+  const name = useRecoilValue(nameState)
+  const [prevName, setPrevName] = useState(name)
   const [serviceStr, setServiceStr] = useRecoilState(serviceStrState)
   const valid = useRecoilValue(serviceValidState)
 
   useEffect(() => {
-    const service =
-      mode === 'yaml' ? fromYaml(serviceStr) : JSON.parse(serviceStr)
-    service.secretData.PAYMENT_POINTER = props.paymentPointer
     setServiceStr(
-      mode === 'yaml' ? toYaml(service) : JSON.stringify(service, null, 2)
+      serviceStr
+        .replace(PROXY_PAYMENT_POINTER, props.paymentPointer)
+        .replace(
+          PROXY_RECEIPTS_URL,
+          `${props.receiptVerifierUri}/balances/${prevName}:creditReceipt`
+        )
     )
   }, [])
+
+  useEffect(() => {
+    if (name !== prevName) {
+      setServiceStr(
+        serviceStr.replace(
+          `${props.receiptVerifierUri}/balances/${prevName}:creditReceipt`,
+          `${props.receiptVerifierUri}/balances/${name}:creditReceipt`
+        )
+      )
+      setPrevName(name)
+    }
+  }, [name])
 
   useEffect(() => {
     if (mode !== newMode) {

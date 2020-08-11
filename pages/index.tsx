@@ -35,7 +35,10 @@ const IndexPage: NextPage<IndexProps> = (props: IndexProps) => (
       </a>
     </p>
     <NameField />
-    <Editor paymentPointer={props.paymentPointer} />
+    <Editor
+      paymentPointer={props.paymentPointer}
+      receiptVerifierUri={props.receiptVerifierUri}
+    />
     <Advanced>
       <TokenField />
     </Advanced>
