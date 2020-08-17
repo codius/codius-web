@@ -1,57 +1,37 @@
-import { RecoilRoot } from 'recoil'
 import { GetServerSideProps, NextPage } from 'next'
 import getConfig from 'next/config'
 
-import { Advanced } from '../components/Advanced'
-import { DeployButton } from '../components/DeployButton'
-import { DeployResult } from '../components/DeployResult'
-import { Editor } from '../components/Editor'
 import { Head } from '../components/Head'
-import { NameField } from '../components/NameField'
-import { PaymentRequired } from '../components/PaymentRequired'
 import { ReceiptSubmitter } from '../components/ReceiptSubmitter'
-import { TokenField, initializeTokenState } from '../components/TokenField'
+import { WebMonetizationStatus } from '../components/WebMonetizationStatus'
 
 const { publicRuntimeConfig } = getConfig()
 
 interface IndexProps {
-  codiusHostURI: string
-  receiptVerifierUri: string
+  balanceId: string
   paymentPointer: string
+  receiptVerifierUri: string
+  requestPrice: number
 }
 
-const IndexPage: NextPage<IndexProps> = (props: IndexProps) => (
-  <RecoilRoot initializeState={initializeTokenState}>
-    <Head paymentPointer={props.paymentPointer} />
-    <ReceiptSubmitter receiptVerifierUri={props.receiptVerifierUri} />
-    <p>
-      Create a serverless{' '}
-      <a
-        target='_blank'
-        rel='noopener noreferrer'
-        href='https://godoc.org/github.com/codius/codius-operator/servers#Service'
-      >
-        Codius service
-      </a>
-    </p>
-    <NameField />
-    <Editor
-      paymentPointer={props.paymentPointer}
-      receiptVerifierUri={props.receiptVerifierUri}
-    />
-    <Advanced>
-      <TokenField />
-    </Advanced>
-    <br />
-    <DeployButton codiusHostURI={props.codiusHostURI} />
-    <PaymentRequired />
-    <DeployResult codiusHostURI={props.codiusHostURI} />
-  </RecoilRoot>
-)
+const IndexPage: NextPage<IndexProps> = (props: IndexProps) => {
+  return (
+    <div>
+      <Head paymentPointer={props.paymentPointer} />
+      <ReceiptSubmitter
+        balanceId={props.balanceId}
+        receiptVerifierUri={props.receiptVerifierUri}
+        requestPrice={props.requestPrice}
+      />
+      <WebMonetizationStatus />
+    </div>
+  )
+}
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
   return {
     props: {
+      balanceId: ctx.req.headers.host.split('.', 1),
       ...publicRuntimeConfig
     }
   }
