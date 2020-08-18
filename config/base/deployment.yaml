@@ -16,5 +16,5 @@ spec:
         app: codius-web
     spec:
       containers:
-      - name: codius-web
-        image: codius/codius-web
+        - name: codius-web
+          image: codius/codius-web

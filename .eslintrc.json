@@ -1,0 +1,82 @@
+{
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "prettier/@typescript-eslint",
+    "prettier/react"
+  ],
+  "plugins": ["@typescript-eslint", "react", "import", "prettier"],
+  "rules": {
+    "eol-last": "warn",
+    "no-multiple-empty-lines": ["warn", { "max": 1 }],
+    "lines-between-class-members": [
+      "warn",
+      "always",
+      { "exceptAfterSingleLine": true }
+    ],
+    "no-unneeded-ternary": "error",
+    "no-nested-ternary": "warn",
+    "prefer-object-spread": "warn",
+    "react/react-in-jsx-scope": 0,
+    "import/no-default-export": "warn",
+    "import/newline-after-import": "warn",
+    "import/order": [
+      "warn",
+      {
+        "newlines-between": "always",
+        "groups": [
+          "builtin",
+          ["internal", "external"],
+          "parent",
+          "sibling",
+          "index"
+        ]
+      }
+    ],
+    "no-void": [
+      "error",
+      {
+        "allowAsStatement": true
+      }
+    ]
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "overrides": [
+    {
+      "files": ["*.tsx"],
+      "rules": {
+        "semi": ["error", "never"]
+      }
+    },
+    {
+      "files": ["*.tsx"],
+      "rules": {
+        "@typescript-eslint/explicit-member-accessibility": "warn",
+        "@typescript-eslint/no-use-before-define": "warn",
+        "@typescript-eslint/indent": ["error", 2],
+        "@typescript-eslint/explicit-function-return-type": "warn",
+        "@typescript-eslint/promise-function-async": "warn",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/restrict-plus-operands": "warn",
+        "@typescript-eslint/no-unnecessary-type-assertion": "warn"
+      }
+    }
+  ],
+  "env": {
+    "browser": true,
+    "node": true
+  }
+}

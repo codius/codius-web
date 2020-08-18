@@ -7,5 +7,5 @@ spec:
   selector:
     app: codius-web
   ports:
-  - protocol: TCP
-    port: 3000
+    - protocol: TCP
+      port: 3000
